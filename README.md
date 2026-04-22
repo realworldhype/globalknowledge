@@ -132,7 +132,7 @@ const globe = Globe()(document.getElementById('globe'))
 /////////////////////////////////////////////////////
 // STOCK ENGINE (IMPROVED TREND LOGIC)
 ////////////////////////////////////////////////////
-const API = d7kc2n1r01qiqbctqjpgd7kc2n1r01qiqbctqjq0"https://finnhub.io/api/v1/quote";
+const API = "https://finnhub.io/api/v1/quote";
 const TOKEN = "d7kc2n1r01qiqbctqjpgd7kc2n1r01qiqbctqjq0";
 
 let stocks = ["AAPL","TSLA","NVDA"];
