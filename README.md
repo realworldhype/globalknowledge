@@ -1,1 +1,220 @@
-# globalknowledge
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GLOBAL INTELLIGENCE TERMINAL v3</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/globe.gl"></script>
+
+<style>
+body {
+margin: 0;
+font-family: Inter;
+background: radial-gradient(circle at top, #050505, #000);
+color: white;
+overflow: hidden;
+}
+
+header {
+display:flex;
+justify-content:space-between;
+padding:14px 18px;
+background: rgba(10,10,10,0.85);
+border-bottom:1px solid #222;
+backdrop-filter: blur(10px);
+}
+
+.title {
+color:#00ffcc;
+font-weight:700;
+letter-spacing:2px;
+}
+
+.container {
+display:flex;
+height:calc(100vh - 55px);
+}
+
+/* GLOBE */
+#globe {
+flex:2;
+}
+
+/* PANEL */
+.panel {
+flex:1;
+background: rgba(10,10,10,0.95);
+border-left:1px solid #222;
+padding:12px;
+overflow-y:auto;
+}
+
+.card {
+background: linear-gradient(145deg, #111, #0a0a0a);
+border:1px solid #222;
+border-radius:12px;
+padding:10px;
+margin-bottom:10px;
+transition:0.2s;
+}
+
+.card:hover {
+transform: translateY(-2px);
+border-color:#00ffcc;
+}
+
+input {
+width:100%;
+padding:10px;
+background:#111;
+border:1px solid #333;
+border-radius:8px;
+color:white;
+margin-bottom:10px;
+}
+
+.small { font-size:12px; color:#aaa; }
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="title">GLOBAL INTELLIGENCE TERMINAL</div>
+<div id="clock"></div>
+</header>
+
+<div class="container">
+<div id="globe"></div>
+
+<div class="panel">
+<input id="search" placeholder="Add stock (AAPL, TSLA, NVDA...)"/>
+
+<h3>📊 MARKET INTELLIGENCE</h3>
+<div id="stocks"></div>
+
+<h3>📰 GLOBAL SIGNALS</h3>
+<div id="news"></div>
+</div>
+</div>
+
+<script>
+
+/////////////////////////////////////////////////////
+// CLOCK
+////////////////////////////////////////////////////
+setInterval(()=>{
+document.getElementById("clock").innerText =
+new Date().toLocaleTimeString();
+},1000);
+
+/////////////////////////////////////////////////////
+// GLOBE (interactive upgrade)
+////////////////////////////////////////////////////
+const globe = Globe()(document.getElementById('globe'))
+.globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+.bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+.backgroundColor('black')
+.pointsData([
+{lat:40.7,lng:-74,size:0.6,color:"red",label:"NY Financial Hub"},
+{lat:51.5,lng:-0.1,size:0.6,color:"orange",label:"London Markets"},
+{lat:35.6,lng:139.6,size:0.6,color:"cyan",label:"Tokyo Tech Flow"},
+{lat:48.8,lng:2.3,size:0.6,color:"yellow",label:"EU News Cluster"}
+])
+.pointColor(d=>d.color)
+.pointAltitude(0.03)
+.pointLabel(d=>d.label);
+
+/////////////////////////////////////////////////////
+// STOCK ENGINE (IMPROVED TREND LOGIC)
+////////////////////////////////////////////////////
+const API = d7kc2n1r01qiqbctqjpgd7kc2n1r01qiqbctqjq0"https://finnhub.io/api/v1/quote";
+const TOKEN = "d7kc2n1r01qiqbctqjpgd7kc2n1r01qiqbctqjq0";
+
+let stocks = ["AAPL","TSLA","NVDA"];
+const history = {};
+const charts = {};
+
+const container = document.getElementById("stocks");
+
+stocks.forEach(s=>{
+history[s]=[];
+const div=document.createElement("div");
+div.className="card";
+div.innerHTML=`
+<b>${s}</b>
+<div id="price-${s}">loading...</div>
+<canvas id="chart-${s}"></canvas>
+<div class="small" id="ai-${s}">analyzing trend...</div>
+`;
+container.appendChild(div);
+});
+
+function trend(data){
+if(data.length<5) return "neutral";
+let slope = data[data.length-1]-data[0];
+if(slope>0) return "bullish";
+if(slope<0) return "bearish";
+return "sideways";
+}
+
+async function update(s){
+const res=await fetch(`${API}?symbol=${s}&token=${TOKEN}`);
+const d=await res.json();
+
+history[s].push(d.c);
+if(history[s].length>20) history[s].shift();
+
+document.getElementById(`price-${s}`).innerText=`$${d.c.toFixed(2)}`;
+
+let t = trend(history[s]);
+
+document.getElementById(`ai-${s}`).innerText =
+t==="bullish"?"AI: upward trend detected 📈":
+t==="bearish"?"AI: downward pressure detected 📉":
+"AI: consolidation phase ⚖️";
+
+if(!charts[s]){
+const ctx=document.getElementById(`chart-${s}`);
+charts[s]=new Chart(ctx,{
+type:"line",
+data:{labels:history[s],datasets:[{data:history[s],borderColor:"#00ffcc",tension:0.3}]},
+options:{plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}}
+});
+}else{
+charts[s].data.datasets[0].data=history[s];
+charts[s].update();
+}
+}
+
+setInterval(()=>stocks.forEach(update),8000);
+
+/////////////////////////////////////////////////////
+// NEWS (clean feed)
+////////////////////////////////////////////////////
+async function news(){
+const res=await fetch("https://newsapi.org/v2/top-headlines?language=en&pageSize=5&apiKey=97a32a44f39d479b8e3af9c445fa07d0");
+const d=await res.json();
+
+const c=document.getElementById("news");
+c.innerHTML="";
+
+d.articles.forEach(a=>{
+const div=document.createElement("div");
+div.className="card";
+div.innerHTML=`
+<b>${a.title}</b>
+<div class="small">global signal detected</div>
+`;
+c.appendChild(div);
+});
+}
+news();
+
+</script>
+
+</body>
+</html>
