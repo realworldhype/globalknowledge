@@ -199,7 +199,7 @@ setInterval(()=>stocks.forEach(update),8000);
 async function news(){
 const res=await fetch("https://newsapi.org/v2/top-headlines?language=en&pageSize=5&apiKey=97a32a44f39d479b8e3af9c445fa07d0");
 const d=await res.json();
-  if (!d || !d.c return;
+  if (!d || !d.articles) return;
 
 const c=document.getElementById("news");
 c.innerHTML="";
