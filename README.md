@@ -191,7 +191,8 @@ charts[s].update();
 }
 }
 
-setInterval(()=>stocks.forEach(update);
+setInterval(()=>stocks.forEach(update), 8000);
+  stocks.forEach(update)
 
 /////////////////////////////////////////////////////
 // NEWS (clean feed)
