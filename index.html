@@ -1,7 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-...
-</html>
+index.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -135,7 +132,7 @@ const globe = Globe()(document.getElementById('globe'))
 /////////////////////////////////////////////////////
 // STOCK ENGINE (IMPROVED TREND LOGIC)
 ////////////////////////////////////////////////////
-const API = d7kc2n1r01qiqbctqjpgd7kc2n1r01qiqbctqjq0"https://finnhub.io/api/v1/quote";
+const API = "https://finnhub.io/api/v1/quote";
 const TOKEN = "d7kc2n1r01qiqbctqjpgd7kc2n1r01qiqbctqjq0";
 
 let stocks = ["AAPL","TSLA","NVDA"];
@@ -194,7 +191,8 @@ charts[s].update();
 }
 }
 
-setInterval(()=>stocks.forEach(update),8000);
+setInterval(()=>stocks.forEach(update), 8000);
+  stocks.forEach(update)
 
 /////////////////////////////////////////////////////
 // NEWS (clean feed)
@@ -202,6 +200,7 @@ setInterval(()=>stocks.forEach(update),8000);
 async function news(){
 const res=await fetch("https://newsapi.org/v2/top-headlines?language=en&pageSize=5&apiKey=97a32a44f39d479b8e3af9c445fa07d0");
 const d=await res.json();
+  if (!d || !d.articles) return;
 
 const c=document.getElementById("news");
 c.innerHTML="";
@@ -222,3 +221,4 @@ news();
 
 </body>
 </html>
+
